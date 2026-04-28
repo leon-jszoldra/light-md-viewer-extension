@@ -140,7 +140,6 @@
   function loadScriptsSequentially(paths, index) {
     if (index >= paths.length) return;
     var script = document.createElement('script');
-    script.charset = 'utf-8';
     script.src = getUrl(paths[index]);
     script.onload = function () {
       loadScriptsSequentially(paths, index + 1);

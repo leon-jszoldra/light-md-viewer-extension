@@ -46,11 +46,39 @@ const sharedOptions = {
   logLevel: 'info',
 };
 
+// Provenance banner for the CodeMirror bundle. Composed from package.json so
+// versions stay accurate. Prepended via esbuild's `banner` option which is
+// not subject to minification, so the comment survives in the final output.
+const pkg = JSON.parse(readFileSync(join(__dirname, 'package.json'), 'utf8'));
+const cmDirectDeps = ['codemirror', '@codemirror/lang-markdown', '@codemirror/language-data']
+  .map(name => `${name}@${pkg.dependencies[name]}`);
+const codemirrorBanner = `/*!
+ * CodeMirror 6 bundle for Light MD Viewer Chrome Extension
+ *
+ * Direct entry: src/editor.js
+ * Direct dependencies (from package.json):
+${cmDirectDeps.map(d => ' *   - ' + d).join('\n')}
+ *
+ * Built by esbuild (IIFE, minified, target chrome110, no source maps).
+ * Reproducible via "npm run build" from the project root. See DEPENDENCIES.md.
+ *
+ * Licensed under MIT (CodeMirror, Lezer). Upstream copyright notices retained.
+ *
+ * Note for CWS reviewers: @codemirror/language-data transitively bundles
+ * many language modes (incl. @codemirror/lang-javascript). One JSX-attribute
+ * lexer path uses Function("...") inside a try/catch. It is reachable only
+ * when the editor parses JS/JSX content, which this extension never does -
+ * the editor is fixed to Markdown mode. The construct is inert under MV3 CSP
+ * (no 'unsafe-eval' is granted) and the try/catch absorbs any failure.
+ */
+`;
+
 const bundles = [
   {
     entryPoints: [join(__dirname, 'src', 'editor.js')],
     outfile: join(__dirname, 'lib', 'codemirror-bundle.js'),
     ...sharedOptions,
+    banner: { js: codemirrorBanner },
   },
   {
     entryPoints: [join(__dirname, 'src', 'marked-global.js')],
