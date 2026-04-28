@@ -63,13 +63,16 @@
   meta.content = 'width=device-width, initial-scale=1.0';
   document.head.appendChild(meta);
 
-  // Content Security Policy: only allow scripts/styles from the extension bundle
+  // Content Security Policy: only allow scripts/styles from the extension bundle.
+  // base-uri and object-src are not covered by default-src and must be set explicitly.
   const cspMeta = document.createElement('meta');
   cspMeta.httpEquiv = 'Content-Security-Policy';
   cspMeta.content = "default-src 'none'; script-src " + getUrl('/') +
     "; style-src " + getUrl('/') + " 'unsafe-inline'" +
     "; img-src file: data: blob: https:" +
-    "; font-src " + getUrl('/') + ";";
+    "; font-src " + getUrl('/') +
+    "; base-uri 'none'" +
+    "; object-src 'none';";
   document.head.appendChild(cspMeta);
 
   // Build toolbar and container HTML

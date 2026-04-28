@@ -12,7 +12,9 @@
     "downloads"
   ],
   "host_permissions": [
-    "file:///*"
+    "file:///*/*.md",
+    "file:///*/*.markdown",
+    "file:///*/*.mdown"
   ],
   "background": {
     "service_worker": "background.js"
